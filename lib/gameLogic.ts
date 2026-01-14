@@ -4,7 +4,11 @@
  * R2. Any live cell with two or three live neighbors lives on to the next generation
  * R3. Any live cell with more than three live neighbors dies (overpopulation)
  * R4. Any dead cell with exactly three live neighbors becomes a live cell (reproduction)
+ * 
+ * Obs: These rules are the orignal rules, but we can change them based on the CONFIG file.
  */
+
+import { CONFIG } from "./config";
 
 export type BoardState = number[][];
 
@@ -61,10 +65,14 @@ export function getNextGeneration(board: BoardState): BoardState {
 
       if (isAlive) {
         // Live cell survives if it has 2 or 3 neighbors (R1-R2-R3)
-        nextRow[col] = liveNeighbors === 2 || liveNeighbors === 3 ? 1 : 0;
+        nextRow[col] = 
+          liveNeighbors === CONFIG.MIN_NEIGHBORS_TO_SURVIVE || 
+          liveNeighbors === CONFIG.MAX_NEIGHBORS_TO_SURVIVE 
+            ? 1 
+            : 0;
       } else {
         // Dead cell becomes alive if it has exactly 3 neighbors (R4)
-        nextRow[col] = liveNeighbors === 3 ? 1 : 0;
+        nextRow[col] = liveNeighbors === CONFIG.NEIGHBORS_TO_REPRODUCE ? 1 : 0;
       }
     }
     nextBoard.push(nextRow);
@@ -120,7 +128,7 @@ export function getFutureState(
 // Throws an error if it doesn't stabilize within maxIterations
 export function getFinalState(
   board: BoardState,
-  maxIterations: number = 1000
+  maxIterations: number = CONFIG.MAX_ITERATIONS
 ): { state: BoardState; generations: number } {
   let currentBoard = board;
   let previousBoard: BoardState | null = null;

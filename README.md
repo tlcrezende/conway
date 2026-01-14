@@ -86,6 +86,7 @@ conway/
 │   ├── Cell.tsx                          # Individual cell component
 │   └── Controls.tsx                      # Control buttons
 ├── lib/
+│   ├── config.ts                         # Centralized configuration constants
 │   ├── gameLogic.ts                      # Pure Conway's Game of Life logic
 │   ├── prisma.ts                         # Prisma client singleton
 │   └── validations.ts                    # Zod validation schemas
@@ -183,9 +184,11 @@ Find the final stable state of the board (or empty state).
 ```json
 {
   "error": "Board did not converge",
-  "message": "The board did not stabilize within 1000 iterations"
+  "message": "The board did not stabilize within [MAX_ITERATIONS] iterations"
 }
 ```
+
+Note: `[MAX_ITERATIONS]` is configurable via `lib/config.ts` (default: 1000).
 
 ### GET `/api/boards/[id]`
 
@@ -208,6 +211,32 @@ Conway's Game of Life follows these rules:
 2. **Survival**: Any live cell with two or three live neighbors survives
 3. **Overpopulation**: Any live cell with more than three live neighbors dies
 4. **Reproduction**: Any dead cell with exactly three live neighbors becomes alive
+
+## Configuration
+
+All magic numbers and constants used throughout the application are centralized in `lib/config.ts`. This makes it easy to adjust limits, defaults, and game rules without searching through multiple files.
+
+### Configuration File: `lib/config.ts`
+
+The configuration object includes:
+
+- **Board size limits**: `MAX_BOARD_SIZE` (default: 1000) - Maximum board dimensions
+- **Iteration and generation limits**: 
+  - `MAX_ITERATIONS` (default: 1000) - Maximum iterations for final state calculation
+  - `MAX_GENERATIONS` (default: 1000) - Maximum generations allowed in future state requests
+- **Display settings**:
+  - `MAX_DISPLAY_SIZE` (default: 50) - Maximum board size displayed (larger boards are cropped)
+  - `DEFAULT_CELL_SIZE` (default: 12) - Default pixel size for cells
+- **Default values**:
+  - `DEFAULT_GENERATIONS` (default: 10) - Default number of generations in the UI input
+  - `DEFAULT_BOARD_ROWS` (default: 30) - Default rows for the board editor
+  - `DEFAULT_BOARD_COLS` (default: 30) - Default columns for the board editor
+- **Game rules** (Conway's Game of Life):
+  - `MIN_NEIGHBORS_TO_SURVIVE` (default: 2) - Minimum neighbors for a live cell to survive
+  - `MAX_NEIGHBORS_TO_SURVIVE` (default: 3) - Maximum neighbors for a live cell to survive
+  - `NEIGHBORS_TO_REPRODUCE` (default: 3) - Exact number of neighbors for a dead cell to become alive
+
+To modify any of these values, simply edit `lib/config.ts`. All parts of the application that use these constants will automatically use the updated values.
 
 ## Database Schema
 
@@ -246,10 +275,10 @@ npm run lint
 
 ## Performance Considerations
 
-- Boards larger than 50x50 are automatically cropped in the display (but full state is preserved)
+- Boards larger than the configured `MAX_DISPLAY_SIZE` (default: 50x50) are automatically cropped in the display (but full state is preserved)
 - React components are memoized to prevent unnecessary re-renders
-- The final state calculation has a maximum iteration limit of 1000 to prevent infinite loops
-- Board size is limited to 1000x1000 in validation
+- The final state calculation has a maximum iteration limit (configured via `MAX_ITERATIONS`, default: 1000) to prevent infinite loops
+- Board size is limited by `MAX_BOARD_SIZE` (default: 1000x1000) in validation
 
 ## License
 

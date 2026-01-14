@@ -6,6 +6,7 @@ import Board from "@/components/Board";
 import Controls from "@/components/Controls";
 import BoardEditor from "@/components/BoardEditor";
 import type { BoardState } from "@/lib/gameLogic";
+import { CONFIG } from "@/lib/config";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -183,8 +184,8 @@ export default function Home() {
             {/* Left Column: Board Editor */}
             <div className="rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
               <BoardEditor
-                rows={30}
-                cols={30}
+                rows={CONFIG.DEFAULT_BOARD_ROWS}
+                cols={CONFIG.DEFAULT_BOARD_COLS}
                 onBoardChange={(board) => {
                   setLocalBoard(board);
                   setBoardId(null);
@@ -291,7 +292,7 @@ export default function Home() {
               <div className="rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
                 <h2 className="mb-4 text-xl font-semibold">Current State</h2>
                 {currentBoard ? (
-                  <Board state={currentBoard} cellSize={10} />
+                  <Board state={currentBoard} cellSize={CONFIG.DEFAULT_CELL_SIZE} />
                 ) : (
                   <div className="flex items-center justify-center p-8 text-gray-500">
                     No board loaded. Create and upload a board to start.

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, memo } from "react";
+import { CONFIG } from "@/lib/config";
 
 interface ControlsProps {
   boardId: string | null;
@@ -17,7 +18,7 @@ const Controls = memo(function Controls({
   onFinalState,
   isLoading = false,
 }: ControlsProps) {
-  const [generations, setGenerations] = useState(10);
+  const [generations, setGenerations] = useState(CONFIG.DEFAULT_GENERATIONS);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleNextState = async () => {
@@ -71,7 +72,7 @@ const Controls = memo(function Controls({
           <input
             type="number"
             min="1"
-            max="1000"
+            max={CONFIG.MAX_GENERATIONS}
             value={generations}
             onChange={(e) => setGenerations(Number(e.target.value))}
             disabled={disabled}

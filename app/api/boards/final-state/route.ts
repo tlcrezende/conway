@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getFinalStateSchema } from "@/lib/validations";
 import { getFinalState, type BoardState } from "@/lib/gameLogic";
-
-const MAX_ITERATIONS = 1000;
+import { CONFIG } from "@/lib/config";
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,7 +28,7 @@ export async function POST(request: NextRequest) {
       // Find final state
       const { state: finalState, generations } = getFinalState(
         currentState,
-        MAX_ITERATIONS
+        CONFIG.MAX_ITERATIONS
       );
 
       // Update database with final state
@@ -55,7 +54,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           {
             error: "Board did not converge",
-            message: `The board did not stabilize within ${MAX_ITERATIONS} iterations`,
+            message: `The board did not stabilize within ${CONFIG.MAX_ITERATIONS} iterations`,
           },
           { status: 422 }
         );

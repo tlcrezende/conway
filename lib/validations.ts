@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CONFIG } from "./config";
 
 /**
  * Validates that the input is a valid board matrix
@@ -21,14 +22,14 @@ export const boardSchema = z
   .refine(
     (board) => {
       // Limit board size to prevent performance issues
-      const maxSize = 1000;
+      const maxSize = CONFIG.MAX_BOARD_SIZE;
       return (
         board.length <= maxSize &&
         (board[0]?.length || 0) <= maxSize
       );
     },
     {
-      message: `Board dimensions must not exceed ${1000}x${1000}`,
+      message: `Board dimensions must not exceed ${CONFIG.MAX_BOARD_SIZE}x${CONFIG.MAX_BOARD_SIZE}`,
     }
   );
 
@@ -46,7 +47,7 @@ export const getFutureStateSchema = z.object({
     .number()
     .int()
     .positive()
-    .max(1000, "Maximum 1000 generations allowed"),
+    .max(CONFIG.MAX_GENERATIONS, `Maximum ${CONFIG.MAX_GENERATIONS} generations allowed`),
 });
 
 export const getFinalStateSchema = z.object({

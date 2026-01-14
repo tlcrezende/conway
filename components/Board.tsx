@@ -3,6 +3,7 @@
 import { memo, useMemo } from "react";
 import Cell from "./Cell";
 import type { BoardState } from "@/lib/gameLogic";
+import { CONFIG } from "@/lib/config";
 
 interface BoardProps {
   state: BoardState;
@@ -12,8 +13,8 @@ interface BoardProps {
 
 const Board = memo(function Board({
   state,
-  cellSize = 12,
-  maxDisplaySize = 50,
+  cellSize = CONFIG.DEFAULT_CELL_SIZE,
+  maxDisplaySize = CONFIG.MAX_DISPLAY_SIZE,
 }: BoardProps) {
   // Calculate display dimensions
   const displayState = useMemo(() => {
