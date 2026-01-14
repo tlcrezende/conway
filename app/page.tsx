@@ -1,3 +1,17 @@
+/**
+ * Main Page Component - Conway's Game of Life
+ * 
+ * This component serves as the main entry point for the Conway's Game of Life application.
+ * It manages the board state, handles API interactions, and coordinates between the editor,
+ * controls, and display components.
+ * 
+ * Key Features:
+ * - Board creation and editing via BoardEditor
+ * - Board persistence through API upload
+ * - Board state evolution (next, future, final states)
+ * - Board selection from saved boards
+ * - Real-time state synchronization using SWR
+ */
 "use client";
 
 import { useState, useCallback } from "react";
@@ -16,7 +30,6 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch board data if we have an ID
   const { data: boardData, mutate } = useSWR(
     boardId ? `/api/boards/${boardId}` : null,
     fetcher,
@@ -38,7 +51,6 @@ export default function Home() {
 
   const currentBoard = boardData?.state || localBoard;
 
-  // Removed useCallback - function is only used inline, no performance benefit
   const handleUpload = async (board: BoardState) => {
     setIsLoading(true);
     setError(null);
@@ -59,6 +71,8 @@ export default function Home() {
       const data = await response.json();
       setBoardId(data.id);
       setLocalBoard(data.state);
+
+      // Refresh both board data and board list to reflect changes
       await mutate();
       await mutateAllBoards();
     } catch (err) {
@@ -144,6 +158,7 @@ export default function Home() {
       });
 
       if (!response.ok) {
+        // 422 indicates board didn't converge (expected behavior, not an error)
         if (response.status === 422) {
           const errorData = await response.json();
           setError(errorData.message || "Board did not converge");

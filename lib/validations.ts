@@ -3,7 +3,8 @@ import { CONFIG } from "./config";
 
 /**
  * Validates that the input is a valid board matrix
- * A board must be a 2D array of 0s and 1s
+ * A board must be a 2D array of 0s and 1s with consistent row lengths
+ * and dimensions within configured limits
  */
 export const boardSchema = z
   .array(z.array(z.union([z.literal(0), z.literal(1)])))

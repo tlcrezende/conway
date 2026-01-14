@@ -16,7 +16,8 @@ const Board = memo(function Board({
   cellSize = CONFIG.DEFAULT_CELL_SIZE,
   maxDisplaySize = CONFIG.MAX_DISPLAY_SIZE,
 }: BoardProps) {
-  // Calculate display dimensions
+  // Calculate display dimensions with cropping for large boards
+  // Prevents performance issues when rendering very large boards
   const displayState = useMemo(() => {
     if (state.length === 0 || state[0]?.length === 0) {
       return [];
@@ -25,12 +26,13 @@ const Board = memo(function Board({
     const rows = state.length;
     const cols = state[0].length;
 
-    // If board is too large, show a cropped version
+    // Crop board if it exceeds maximum display size
     if (rows > maxDisplaySize || cols > maxDisplaySize) {
       const cropped: BoardState = [];
       const maxRows = Math.min(rows, maxDisplaySize);
       const maxCols = Math.min(cols, maxDisplaySize);
 
+      // Extract top-left portion of the board
       for (let i = 0; i < maxRows; i++) {
         cropped.push(state[i].slice(0, maxCols));
       }

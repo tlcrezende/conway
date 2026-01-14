@@ -45,7 +45,7 @@ export default function BoardEditor({
   onBoardChange,
 }: BoardEditorProps) {
   
-  // Use memo to initialize the empty board only once
+  // Initialize empty board only when dimensions change
   const initialBoard = useMemo<BoardState>(
     () =>
       Array(rows)
@@ -66,6 +66,8 @@ export default function BoardEditor({
               )
             : rowArray
         );
+
+        // Notify parent component of changes
         onBoardChange(updatedBoard);
         return updatedBoard;
       });
