@@ -20,6 +20,7 @@ A production-ready, fullstack implementation of Conway's Game of Life built with
 - **ORM**: Prisma 7.2.0
 - **Validation**: Zod 4.3.5
 - **Data Fetching**: SWR 2.3.8
+- **Testing**: Jest 30.2.0, React Testing Library, ts-jest
 
 ## Getting Started
 
@@ -272,6 +273,72 @@ npm start
 ```bash
 npm run lint
 ```
+
+## Testing
+
+The project includes comprehensive test coverage for both the game logic and API endpoints using Jest and React Testing Library.
+
+### Running Tests
+
+**Run all tests**:
+```bash
+npm test
+```
+
+**Run tests in watch mode** (useful during development):
+```bash
+npm run test:watch
+```
+
+**Run tests with coverage report**:
+```bash
+npm run test:coverage
+```
+
+After running coverage, you can view a detailed HTML report by opening `coverage/lcov-report/index.html` in your browser.
+
+### Test Structure
+
+The test suite is organized in the `__tests__` directory:
+
+```
+__tests__/
+├── api/
+│   └── boards/
+│       ├── [id].test.ts          # GET /api/boards/[id] endpoint tests
+│       ├── final-state.test.ts   # POST /api/boards/final-state endpoint tests
+│       ├── future-state.test.ts  # POST /api/boards/future-state endpoint tests
+│       ├── next-state.test.ts    # POST /api/boards/next-state endpoint tests
+│       ├── route.test.ts         # GET /api/boards endpoint tests
+│       └── upload.test.ts        # POST /api/boards/upload endpoint tests
+└── lib/
+    ├── gameLogic.test.ts         # Core game logic tests (rules, generations, etc.)
+    └── validations.test.ts       # Zod validation schema tests
+```
+
+### Test Coverage
+
+The test suite covers:
+
+- **Game Logic** (`lib/gameLogic.test.ts`):
+  - Next generation calculation
+  - Game rules (underpopulation, survival, overpopulation, reproduction)
+  - Future state calculation (N generations)
+  - Final state detection (stable states and empty boards)
+  - Edge cases (empty boards, single cells, patterns)
+
+- **Validations** (`lib/validations.test.ts`):
+  - Board format validation
+  - Size constraints
+  - Data type validation
+  - Error messages
+
+- **API Endpoints** (`__tests__/api/boards/`):
+  - Request/response validation
+  - Error handling
+  - Database operations
+  - Edge cases and boundary conditions
+
 
 ## Performance Considerations
 
