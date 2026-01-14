@@ -1,36 +1,256 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nearsure Take Home Assessment - Conway's Game of Life
+
+A production-ready, fullstack implementation of Conway's Game of Life built with Next.js 14+, TypeScript, Prisma, and SQLite.
+
+## Features
+
+- **Fullstack Architecture**: Server-side API routes with client-side React components
+- **Persistent Storage**: SQLite database with Prisma ORM
+- **Type Safety**: Strict TypeScript throughout
+- **Validation**: Zod schemas for API input validation
+- **Optimized Performance**: Memoized React components for large boards
+- **Modern UI**: Tailwind CSS
+
+## Tech Stack
+
+- **Framework**: Next.js 16.1.1 (App Router)
+- **Language**: TypeScript (Strict mode)
+- **Styling**: Tailwind CSS 4
+- **Database**: SQLite
+- **ORM**: Prisma 7.2.0
+- **Validation**: Zod 4.3.5
+- **Data Fetching**: SWR 2.3.8
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 18+ 
+- npm, yarn, pnpm, or bun
+
+### Installation
+
+1. **Clone the repository** (if applicable) or navigate to the project directory
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**:
+   ```bash
+   cp .env.example .env
+   ```
+   
+   The `.env` file should contain:
+   ```
+   DATABASE_URL="file:./dev.db"
+   ```
+
+4. **Set up the database**:
+   ```bash
+   npx prisma generate
+   npx prisma migrate dev --name init
+   ```
+   
+   This will:
+   - Generate the Prisma Client
+   - Create the SQLite database file (`dev.db`)
+   - Run the initial migration
+
+5. **Start the development server**:
+   ```bash
+   npm run dev
+   ```
+
+6. **Open your browser**:
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## Project Structure
+
+```
+conway/
+├── app/
+│   ├── api/
+│   │   └── boards/
+│   │       ├── upload/route.ts          # POST - Upload a new board
+│   │       ├── next-state/route.ts      # POST - Get next generation
+│   │       ├── future-state/route.ts    # POST - Get future N generations
+│   │       ├── final-state/route.ts     # POST - Find stable state
+│   │       └── [id]/route.ts            # GET - Get board by ID
+│   ├── layout.tsx                        # Root layout
+│   └── page.tsx                          # Main page
+├── components/
+│   ├── Board.tsx                         # Board display component
+│   ├── BoardEditor.tsx                   # Interactive board editor
+│   ├── Cell.tsx                          # Individual cell component
+│   └── Controls.tsx                      # Control buttons
+├── lib/
+│   ├── gameLogic.ts                      # Pure Conway's Game of Life logic
+│   ├── prisma.ts                         # Prisma client singleton
+│   └── validations.ts                    # Zod validation schemas
+├── prisma/
+│   └── schema.prisma                     # Database schema
+└── public/                               # Static assets
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## API Endpoints
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### POST `/api/boards/upload`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Upload a new board to the database.
 
-## Learn More
+**Request Body**:
+```json
+{
+  "board": [[0, 1, 0], [1, 1, 1], [0, 1, 0]]
+}
+```
 
-To learn more about Next.js, take a look at the following resources:
+**Response** (201):
+```json
+{
+  "id": "clx...",
+  "state": [[0, 1, 0], [1, 1, 1], [0, 1, 0]],
+  "createdAt": "2024-01-01T00:00:00.000Z"
+}
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### POST `/api/boards/next-state`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Calculate and return the next generation of a board.
 
-## Deploy on Vercel
+**Request Body**:
+```json
+{
+  "id": "clx..."
+}
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Response** (200):
+```json
+{
+  "id": "clx...",
+  "state": [[1, 1, 1], [1, 0, 1], [1, 1, 1]],
+  "createdAt": "2024-01-01T00:00:00.000Z"
+}
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### POST `/api/boards/future-state`
+
+Advance the board by N generations.
+
+**Request Body**:
+```json
+{
+  "id": "clx...",
+  "generations": 10
+}
+```
+
+**Response** (200):
+```json
+{
+  "id": "clx...",
+  "state": [[...]],
+  "generations": 10,
+  "createdAt": "2024-01-01T00:00:00.000Z"
+}
+```
+
+### POST `/api/boards/final-state`
+
+Find the final stable state of the board (or empty state).
+
+**Request Body**:
+```json
+{
+  "id": "clx..."
+}
+```
+
+**Response** (200):
+```json
+{
+  "id": "clx...",
+  "state": [[...]],
+  "generations": 42,
+  "createdAt": "2024-01-01T00:00:00.000Z"
+}
+```
+
+**Error Response** (422):
+```json
+{
+  "error": "Board did not converge",
+  "message": "The board did not stabilize within 1000 iterations"
+}
+```
+
+### GET `/api/boards/[id]`
+
+Get a board by its ID.
+
+**Response** (200):
+```json
+{
+  "id": "clx...",
+  "state": [[...]],
+  "createdAt": "2024-01-01T00:00:00.000Z"
+}
+```
+
+## Game Rules
+
+Conway's Game of Life follows these rules:
+
+1. **Underpopulation**: Any live cell with fewer than two live neighbors dies
+2. **Survival**: Any live cell with two or three live neighbors survives
+3. **Overpopulation**: Any live cell with more than three live neighbors dies
+4. **Reproduction**: Any dead cell with exactly three live neighbors becomes alive
+
+## Database Schema
+
+```prisma
+model Board {
+  id        String   @id @default(cuid())
+  state     String   // JSON string representing the board matrix
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+```
+
+## Development
+
+### Running Prisma Studio
+
+To view and edit the database visually:
+
+```bash
+npx prisma studio
+```
+
+### Building for Production
+
+```bash
+npm run build
+npm start
+```
+
+### Linting
+
+```bash
+npm run lint
+```
+
+## Performance Considerations
+
+- Boards larger than 50x50 are automatically cropped in the display (but full state is preserved)
+- React components are memoized to prevent unnecessary re-renders
+- The final state calculation has a maximum iteration limit of 1000 to prevent infinite loops
+- Board size is limited to 1000x1000 in validation
+
+## License
+
+This project is created for technical interview purposes.
