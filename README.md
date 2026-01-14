@@ -347,6 +347,42 @@ The test suite covers:
 - The final state calculation has a maximum iteration limit (configured via `MAX_ITERATIONS`, default: 1000) to prevent infinite loops
 - Board size is limited by `MAX_BOARD_SIZE` (default: 1000x1000) in validation
 
+## Future Improvements
+
+This section outlines potential enhancements that could add value to the project across different areas:
+
+### User Experience (UX) Improvements
+
+- **Board Management**:
+  - Implement undo/redo functionality for board editing
+  - Save favorite boards locally
+  - Add statistics panel (live cell count, generation, population trends)
+  - Implement toast notifications for user actions
+  - Add tooltips explaining game rules and controls
+  - Show estimated time for operations
+
+- **Test Coverage**:
+  - Add React component tests using React Testing Library
+  - Implement E2E tests with Playwright or Cypress
+  - Add visual regression tests
+  - Set up test coverage thresholds in CI/CD
+
+- **Infrastructure & DevOps**:
+
+  - Set up GitHub Actions or GitLab CI for automated testing
+  - Add automated deployment pipeline
+  - Implement automated dependency updates (Dependabot, Renovate)
+  - Add automated code quality checks
+  - Create Dockerfile for easy deployment
+  - Consider migration to PostgreSQL for production scalability
+
+
+### Documentation
+
+- **Developer Documentation**:
+  - Add API documentation with OpenAPI/Swagger
+  - Create architecture decision records (ADRs)
+
 ## License
 
 This project is created for technical interview purposes.
